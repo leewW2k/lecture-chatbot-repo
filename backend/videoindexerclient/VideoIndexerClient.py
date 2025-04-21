@@ -10,7 +10,7 @@ import schedule
 
 from .Consts import Consts
 from .utils import get_arm_access_token, get_account_access_token_async
-from backend.loggingConfig import logger
+from loggingConfig import logger
 
 
 def get_file_name_no_extension(file_path):

@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import JSONResponse
 
-from backend.userservice.model import User, UserDetails
-from backend.userservice.repository import UserRepositoryService
+from userservice.model import User, UserDetails
+from userservice.repository import UserRepositoryService
 
 # Secret key and JWT setup
 SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")

@@ -3,8 +3,8 @@ import logging
 from dotenv import load_dotenv
 from fastapi import APIRouter
 
-from backend.chatservice.chatservice import ChatService
-from backend.chatservice.model import ChatRequestBody
+from chatservice.chatservice import ChatService
+from chatservice.model import ChatRequestBody
 
 load_dotenv()
 ROUTE_PREFIX = "/chat"

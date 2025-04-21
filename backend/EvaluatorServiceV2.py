@@ -16,7 +16,7 @@ from ragas.metrics import (
     FactualCorrectness, LLMContextPrecisionWithReference, ResponseRelevancy, Faithfulness, LLMContextRecall
 )
 
-from backend.chatservice.chatservice import ChatService
+from chatservice.chatservice import ChatService
 
 load_dotenv()
 class EvaluatorService:

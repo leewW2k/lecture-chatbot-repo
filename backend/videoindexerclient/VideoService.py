@@ -8,8 +8,8 @@ import os
 
 from dotenv import load_dotenv
 
-from backend.videoindexerclient.model import Video
-from backend.videoindexerclient.repository import VideoIndexerRepositoryService
+from videoindexerclient.model import Video
+from videoindexerclient.repository import VideoIndexerRepositoryService
 from .Consts import Consts
 from .VideoIndexerClient import VideoIndexerClient
 from .utils import convert_timestamp_to_ms

@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
 from starlette.responses import JSONResponse
 
-from backend.brokerservice.brokerService import BrokerService
-from backend.brokerservice.model import UpdateRequestBody, CourseDetailsRequest, VideoDetailsRequest, CourseDetails
-from backend.loggingConfig import logger
-from backend.transcriptservice.TranscriptService import TranscriptService
+from brokerservice.brokerService import BrokerService
+from brokerservice.model import UpdateRequestBody, CourseDetailsRequest, VideoDetailsRequest, CourseDetails
+from loggingConfig import logger
+from transcriptservice.TranscriptService import TranscriptService
 
 load_dotenv()
 

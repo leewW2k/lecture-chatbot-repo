@@ -10,10 +10,10 @@ from langchain_community.vectorstores.azure_cosmos_db import CosmosDBSimilarityT
 from langchain_core.documents import Document
 from sqlalchemy.testing.suite.test_reflection import metadata
 
-from backend.EmbeddingService import EmbeddingService
-from backend.databaseservice.databaseService import DatabaseService, database_service
-from backend.loggingConfig import logger
-from backend.utils import convert_seconds_to_mm_ss
+from EmbeddingService import EmbeddingService
+from databaseservice.databaseService import DatabaseService, database_service
+from loggingConfig import logger
+from utils import convert_seconds_to_mm_ss
 from langchain_community.vectorstores import AzureCosmosDBVectorSearch
 from langchain_openai import AzureOpenAIEmbeddings
 

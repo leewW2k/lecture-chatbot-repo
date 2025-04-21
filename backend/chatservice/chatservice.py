@@ -9,11 +9,11 @@ from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from openai import AsyncAzureOpenAI
 
-from backend.chatservice.repository import ChatDatabaseService
-from backend.chatservice.model import ChatHistory
-from backend.chatservice.utils import weighted_reciprocal_rank
-from backend.loggingConfig import logger
-from backend.utils import process_file, get_prompt_template, get_prompt_template_naive, prompt_template_test
+from chatservice.repository import ChatDatabaseService
+from chatservice.model import ChatHistory
+from chatservice.utils import weighted_reciprocal_rank
+from loggingConfig import logger
+from utils import process_file, get_prompt_template, get_prompt_template_naive, prompt_template_test
 
 load_dotenv()
 

@@ -4,11 +4,11 @@ import pymongo
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 
-from backend.EmbeddingService import EmbeddingService
+from EmbeddingService import EmbeddingService
 from langchain_community.vectorstores import AzureCosmosDBVectorSearch
 from langchain_openai import AzureOpenAIEmbeddings
 
-from backend.databaseservice.databaseService import DatabaseService, database_service
+from databaseservice.databaseService import DatabaseService, database_service
 
 load_dotenv()
 

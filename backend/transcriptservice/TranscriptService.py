@@ -12,10 +12,10 @@ from langchain_core.prompts import PromptTemplate
 from langchain_text_splitters import CharacterTextSplitter
 from openai import AsyncAzureOpenAI
 
-from backend.brokerservice.model import CourseDetails
-from backend.loggingConfig import logger
-from backend.transcriptservice.repository import TranscriptRepositoryService
-from backend.utils import convert_seconds_to_mm_ss, process_file, get_prompt_template, get_clean_prompt_template, \
+from brokerservice.model import CourseDetails
+from loggingConfig import logger
+from transcriptservice.repository import TranscriptRepositoryService
+from utils import convert_seconds_to_mm_ss, process_file, get_prompt_template, get_clean_prompt_template, \
     timestamp_to_seconds, seconds_to_timestamp
 
 

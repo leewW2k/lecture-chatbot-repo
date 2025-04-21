@@ -1,11 +1,11 @@
 from bson import ObjectId
 from dotenv import load_dotenv
 
-from backend.brokerservice.model import CourseDetails, VideoDetails
-from backend.brokerservice.status import Status
-from backend.databaseservice.databaseService import database_service
-from backend.loggingConfig import logger
-from backend.videoindexerclient.model import Video
+from brokerservice.model import CourseDetails, VideoDetails
+from brokerservice.status import Status
+from databaseservice.databaseService import database_service
+from loggingConfig import logger
+from videoindexerclient.model import Video
 
 load_dotenv()
 

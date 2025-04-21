@@ -1,11 +1,11 @@
 from bson import ObjectId
 
-from backend.brokerservice.repository import BrokerRepository
-from backend.brokerservice.status import Status
-from backend.loggingConfig import logger
-from backend.transcriptservice.TranscriptService import TranscriptService
-from backend.videoindexerclient.VideoService import VideoService
-from backend.videoindexerclient.model import VideoList
+from brokerservice.repository import BrokerRepository
+from brokerservice.status import Status
+from loggingConfig import logger
+from transcriptservice.TranscriptService import TranscriptService
+from videoindexerclient.VideoService import VideoService
+from videoindexerclient.model import VideoList
 
 
 class BrokerService:

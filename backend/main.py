@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, BackgroundTasks
 from starlette.middleware.cors import CORSMiddleware
 
-from backend.brokerservice.brokerService import BrokerService
-from backend.videoindexerclient.model import VideoList
+from brokerservice.brokerService import BrokerService
+from videoindexerclient.model import VideoList
 from videoindexerclient.router import router as video_indexer_router
 from chatservice.router import router as chat_router
 from brokerservice.router import router as broker_router
