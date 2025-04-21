@@ -12,11 +12,10 @@ azure-identity~=1.20.0
 ffmpeg-python~=0.2.0
 ffmpegcv~=0.3.16
 
-languagechain-text-splitters~=0.3.6
+langchain-text-splitters~=0.3.6
 langchain_community~=0.3.17
-languagechain_openai~=0.3.6
+langchain_openai~=0.3.6
 
 datasets~=3.3.1
 ragas~=0.2.13
 bcrypt~=4.3.0
-logging~=0.4.9.6
