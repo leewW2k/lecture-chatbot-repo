@@ -59,7 +59,7 @@ class BrokerService:
                     result = self.video_indexer_service.database.video_indexer_raw_collection.find_one({'video_indexer_id': video_id})
                     insights = result["insights"]
                     self.transcript_service.map_insights_to_transcript(insights, video_object_id)
-                    self.transcript_service.trigger_transcript_cleaning(video_object_id, course, video.video_description, video_id)
+                    self.transcript_service.trigger_transcript_cleaning(video_object_id, course, video.video_description)
                     self.transcript_service.update_prompt_with_clean_transcript(video_object_id, video_id)
                     print("Completed Video Indexing Process for ID: ", video_object_id)
                     self.broker_db.change_video_status(video_object_id, Status.COMPLETED)
