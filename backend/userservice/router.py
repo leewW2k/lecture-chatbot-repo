@@ -24,12 +24,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 user_db = UserRepositoryService()
 
-# def hash_password(password: str) -> str:
-#     salt = bcrypt.gensalt()
-#     result = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-#     print(result)
-#     return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 

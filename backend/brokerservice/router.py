@@ -68,11 +68,6 @@ def get_videos_manage():
     else:
         return {"message": "No Records Found"}
 
-@router.get("/test/this")
-def testing():
-    transcript_service = TranscriptService()
-    transcript_service.update_prompt_with_clean_transcript(ObjectId('67d6cff1c0089dd068f610f3'), "8oby3fxloz")
-
 @router.post("/course")
 def add_course(body: CourseDetails):
     try:

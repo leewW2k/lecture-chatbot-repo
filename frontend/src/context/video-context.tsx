@@ -12,9 +12,9 @@ interface VideoContextProps {
 const VideoContext = createContext<VideoContextProps | undefined>(undefined);
 
 export const VideoProvider = ({ children }: { children: ReactNode }) => {
-  const storedVideoId = localStorage.getItem('videoId');
-  const storedVideoName = localStorage.getItem('videoName');
-  const storedSummary = localStorage.getItem('summary');
+  const storedVideoId = typeof window !== "undefined" ? localStorage.getItem('videoId') : null;
+  const storedVideoName = typeof window !== "undefined" ? localStorage.getItem('videoName') : null;
+  const storedSummary = typeof window !== "undefined" ? localStorage.getItem('summary') : null;
 
   const [videoId, setVideoId] = useState<string>(storedVideoId || '');
   const [videoName, setVideoName] = useState<string>(storedVideoName || '');
