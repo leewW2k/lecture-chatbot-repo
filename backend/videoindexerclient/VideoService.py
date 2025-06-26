@@ -8,6 +8,8 @@ import os
 
 from dotenv import load_dotenv
 
+from loggingConfig import logger
+from videoindexerclient.WhileVIError import WhileIndexingError
 from videoindexerclient.model import Video
 from videoindexerclient.repository import VideoIndexerRepositoryService
 from .Consts import Consts
@@ -27,8 +29,7 @@ class VideoService:
         azure_resource_manager=os.environ.get('AZURE_RESOURCE_MANAGER')
     ):
         consts = Consts(api_version, api_endpoint, azure_resource_manager, account_name, resource_group, subscription_id)
-        self.client = VideoIndexerClient()
-        self.client.authenticate_async(consts)
+        self.client = VideoIndexerClient(consts)
         self.client.start_authentication_scheduler()
         self.database = VideoIndexerRepositoryService()
 
@@ -40,31 +41,36 @@ class VideoService:
             video_base64_encoded (Video): Video to be indexed. Required.
             excluded_ai (list): AI Features to excluded from Azure Video Indexer. Optional.
         """
-        if excluded_ai is None:
-            excluded_ai = ['Faces', 'Labels', 'Emotions', 'ObservedPeople', 'RollingCredits', 'Celebrities', 'Clapperboard', 'FeaturedClothing', 'ShotType', 'PeopleDetectedClothing']
+        try:
+            if excluded_ai is None:
+                excluded_ai = ['Faces', 'Labels', 'Emotions', 'ObservedPeople', 'RollingCredits', 'Celebrities', 'Clapperboard', 'FeaturedClothing', 'ShotType', 'PeopleDetectedClothing']
 
-        if video_base64_encoded.base64_encoded_video.startswith("data"):
-            data = video_base64_encoded.base64_encoded_video.split(",")[1]
-        else:
-            data = video_base64_encoded.base64_encoded_video
+            if video_base64_encoded.base64_encoded_video.startswith("data"):
+                data = video_base64_encoded.base64_encoded_video.split(",")[1]
+            else:
+                data = video_base64_encoded.base64_encoded_video
 
-        video_data = base64.b64decode(data)
-        video_file = io.BytesIO(video_data)
-        video_file.name = video_base64_encoded.video_name
-        video_id = self.client.file_upload_async(video_file, video_name=video_file.name, excluded_ai=excluded_ai)
+            video_data = base64.b64decode(data)
+            video_file = io.BytesIO(video_data)
+            video_file.name = video_base64_encoded.video_name
+            video_id = self.client.file_upload_async(video_file, video_name=video_file.name, excluded_ai=excluded_ai)
 
-        self.client.wait_for_index_async(video_id)
-        insights = self.client.get_video_async(video_id)
+            self.client.wait_for_index_async(video_id)
+            insights = self.client.get_video_async(video_id)
 
-        if insights and video_id:
-            document = {
-                "video_indexer_id": video_id,
-                "insights": insights
-            }
-            self.database.insert_video_index_raw(document)
-            return video_id, insights
-        else:
-            raise Exception("Indexing Video process failed.")
+            if insights and video_id:
+                document = {
+                    "video_indexer_id": video_id,
+                    "insights": insights
+                }
+                self.database.insert_video_index_raw(document)
+                return video_id, insights
+            else:
+                raise Exception("Indexing Video process failed.")
+        except WhileIndexingError as e:
+            logger.info(e)
+        except Exception as e:
+            logger.info("Error indexing Video: ", e)
 
     def map_insights_to_document(self, insights):
         hash_map = collections.defaultdict(list)
@@ -101,7 +107,6 @@ class VideoService:
 
         self.save_to_file(document, "frames.json")
 
-# TODO: use a broker
     # def trigger_video_pipeline(self, fp):
     #     video_file_id = self.index_video(fp)
     #     self.map_insights_to_document(video_file_id)
@@ -128,7 +133,7 @@ class VideoService:
         return encoded_image
 
     def get_prompt_content(self, video_id: str):
-        result = self.client.get_prompt_content(video_id, check_alreay_exists=False)
+        result = self.client.get_prompt_content(video_id, check_already_exists=False)
         self.database.insert_prompt_content_raw(result, video_id)
         self.database.insert_prompt_context_index(result, video_id)
         return result

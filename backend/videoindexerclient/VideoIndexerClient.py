@@ -9,6 +9,7 @@ from typing import Optional
 import schedule
 
 from .Consts import Consts
+from .WhileVIError import WhileIndexingError, WhileGeneratingPromptError
 from .utils import get_arm_access_token, get_account_access_token_async
 from loggingConfig import logger
 
@@ -18,14 +19,13 @@ def get_file_name_no_extension(file_path):
 
 
 class VideoIndexerClient:
-    def __init__(self) -> None:
+    def __init__(self, consts: Consts) -> None:
         self.arm_access_token = ''
         self.vi_access_token = ''
         self.account = None
-        self.consts = None
-
-    def authenticate_async(self, consts:Consts) -> None:
         self.consts = consts
+
+    def authenticate_async(self) -> None:
         # Get access tokens
         self.arm_access_token = get_arm_access_token(self.consts)
         self.vi_access_token = get_account_access_token_async(self.consts, self.arm_access_token)
@@ -138,30 +138,44 @@ class VideoIndexerClient:
         print(f'Checking if video {video_id} has finished indexing...')
         processing = True
         start_time = time.time()
-        while processing:
-            response = requests.get(url, params=params)
+        retry = 0
+        while processing and retry < 3:
+            try:
+                response = requests.get(url, params=params)
 
-            response.raise_for_status()
+                response.raise_for_status()
 
-            video_result = response.json()
-            video_state = video_result.get('state')
+                video_result = response.json()
+                video_state = video_result.get('state')
 
-            if video_state == 'Processed':
-                processing = False
-                print(f'The video index has completed. Here is the full JSON of the index for video ID {video_id}: \n{video_result}')
-                break
-            elif video_state == 'Failed':
-                processing = False
-                print(f"The video index failed for video ID {video_id}.")
-                break
+                if video_state == 'Processed':
+                    processing = False
+                    print(f'The video index has completed. Here is the full JSON of the index for video ID {video_id}: \n{video_result}')
+                    break
+                elif video_state == 'Failed':
+                    processing = False
+                    print(f"The video index failed for video ID {video_id}.")
+                    break
 
-            print(f'The video index state is {video_state}')
+                print(f'The video index state is {video_state}')
 
-            if timeout_sec is not None and time.time() - start_time > timeout_sec:
-                print(f'Timeout of {timeout_sec} seconds reached. Exiting...')
-                break
+                if timeout_sec is not None and time.time() - start_time > timeout_sec:
+                    print(f'Timeout of {timeout_sec} seconds reached. Exiting...')
+                    break
 
-            time.sleep(10) # wait 10 seconds before checking again
+                time.sleep(10) # wait 10 seconds before checking again
+            except Exception as e:
+                logger.info("Error while waiting for video indexing: " + str(e))
+                # Attempt to authenticate again using the new access token
+                self.authenticate_async()
+                params = {
+                    'accessToken': self.vi_access_token,
+                    'language': language
+                }
+                retry += 1
+            if retry > 3:
+                logger.info("Error while waiting for indexing. Use the video_id to debug: " + video_id)
+                raise WhileIndexingError("Error while waiting for indexing. Use the video_id to debug: " + video_id)
 
     def is_video_processed(self, video_id:str) -> bool:
         self.get_account_async() # if account is not initialized, get it
@@ -262,18 +276,18 @@ class VideoIndexerClient:
         return response.json()
 
     def get_prompt_content(self, video_id:str, timeout_sec:Optional[int]=None,
-                           check_alreay_exists=True) -> Optional[dict]:
+                           check_already_exists=True) -> Optional[dict]:
         """
         Gets the prompt content for the video, waits until the prompt content is ready.
         If the prompt content is not ready within the timeout, it will return None.
 
         :param video_id: The video ID
         :param timeout_sec: The timeout in seconds
-        :param check_alreay_exists: If True, checks if the prompt content already exists
+        :param check_already_exists: If True, checks if the prompt content already exists
         :return: The prompt content for the video, otherwise None
         """
 
-        if check_alreay_exists:
+        if check_already_exists:
             prompt_content = self.get_prompt_content_async(video_id, raise_on_not_found=False)
             if prompt_content is not None:
                 print(f'Prompt content already exists for video ID {video_id}.')
@@ -283,15 +297,26 @@ class VideoIndexerClient:
 
         start_time = time.time()
         prompt_content = None
+        retry = 0
         while prompt_content is None:
-            prompt_content = self.get_prompt_content_async(video_id, raise_on_not_found=False)
+            try:
+                prompt_content = self.get_prompt_content_async(video_id, raise_on_not_found=False)
 
-            if timeout_sec is not None and time.time() - start_time > timeout_sec:
-                print(f'Timeout of {timeout_sec} seconds reached. Exiting...')
-                break
+                if timeout_sec is not None and time.time() - start_time > timeout_sec:
+                    print(f'Timeout of {timeout_sec} seconds reached. Exiting...')
+                    break
 
-            print('Prompt content is not ready yet. Waiting 5 seconds before checking again...')
-            time.sleep(10)
+                print('Prompt content is not ready yet. Waiting 10 seconds before checking again...')
+                time.sleep(10)
+            except Exception as e:
+                logger.info("Error while getting prompt content: " + str(e))
+                # Attempt to authenticate again using the new access token
+                self.authenticate_async()
+                retry += 1
+
+        if retry > 3:
+            logger.info("Error while waiting for prompt generation. Use the video_id to debug: " + video_id)
+            raise WhileGeneratingPromptError("Error while waiting for prompt generation. Use the video_id to debug: " + video_id)
 
         return prompt_content
 
