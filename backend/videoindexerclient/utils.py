@@ -15,7 +15,6 @@ def get_arm_access_token(consts: Consts) -> str:
     credential = DefaultAzureCredential()
     scope = f"{consts.AzureResourceManager}/.default"
     token = credential.get_token(scope)
-    print(token)
     return token.token
 
 

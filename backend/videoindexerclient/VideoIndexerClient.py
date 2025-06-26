@@ -27,14 +27,15 @@ class VideoIndexerClient:
 
     def authenticate_async(self) -> None:
         # Get access tokens
+        logger.info("Retrieving Token...")
         self.arm_access_token = get_arm_access_token(self.consts)
         self.vi_access_token = get_account_access_token_async(self.consts, self.arm_access_token)
 
     def schedule_authentication(self):
         """
-        Schedules authenticate_async to run every 50 minutes.
+        Schedules authenticate_async to run every 30 minutes.
         """
-        schedule.every(30).minutes.do(self.authenticate_async, self.consts)
+        schedule.every(30).minutes.do(self.authenticate_async)
         while True:
             schedule.run_pending()
             time.sleep(30)
